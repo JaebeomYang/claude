@@ -77,7 +77,8 @@ def notify(subject: str, body: str, config: NotifyConfig) -> list[str]:
     if not configured:
         raise RuntimeError(
             "No notification channel is configured (set SMTP_*/NOTIFY_EMAIL_*, "
-            "SLACK_WEBHOOK_URL, or DISCORD_WEBHOOK_URL)."
+            "SLACK_WEBHOOK_URL, DISCORD_WEBHOOK_URL, or TELEGRAM_BOT_TOKEN+"
+            "TELEGRAM_CHAT_ID)."
         )
 
     sent = []
