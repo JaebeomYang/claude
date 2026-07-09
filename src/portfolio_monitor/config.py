@@ -46,6 +46,8 @@ class NotifyConfig:
     smtp_password: str
     email_from: str
     email_to: str
+    slack_webhook_url: str
+    discord_webhook_url: str
 
     @classmethod
     def from_env(cls) -> "NotifyConfig":
@@ -56,4 +58,6 @@ class NotifyConfig:
             smtp_password=os.environ.get("SMTP_PASSWORD", ""),
             email_from=os.environ.get("NOTIFY_EMAIL_FROM", ""),
             email_to=os.environ.get("NOTIFY_EMAIL_TO", ""),
+            slack_webhook_url=os.environ.get("SLACK_WEBHOOK_URL", ""),
+            discord_webhook_url=os.environ.get("DISCORD_WEBHOOK_URL", ""),
         )

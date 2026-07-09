@@ -3,7 +3,7 @@ from datetime import datetime
 
 from .config import NotifyConfig, TossConfig
 from .digest import build_digest
-from .notify import send_email
+from .notify import notify
 from .toss_client import TossClient
 
 
@@ -12,8 +12,8 @@ def main() -> None:
     holdings = toss.get_holdings()
     body = build_digest(holdings)
     subject = f"Portfolio news digest — {datetime.now():%Y-%m-%d %H:%M}"
-    send_email(subject, body, NotifyConfig.from_env())
-    print(subject)
+    sent = notify(subject, body, NotifyConfig.from_env())
+    print(f"{subject} (sent via: {', '.join(sent)})")
     print(body)
 
 

@@ -4,7 +4,7 @@ from datetime import datetime
 from .alerts import Alert, evaluate_holding
 from .config import AlertConfig, NotifyConfig, TossConfig
 from .news import fetch_news
-from .notify import send_email
+from .notify import notify
 from .toss_client import TossClient
 
 
@@ -40,8 +40,8 @@ def main() -> None:
         return
     subject = f"Portfolio alert — {datetime.now():%Y-%m-%d %H:%M} ({len(alerts)})"
     body = "\n".join(f"[{a.reason}] {a.ticker}: {a.detail}" for a in alerts)
-    send_email(subject, body, NotifyConfig.from_env())
-    print(subject)
+    sent = notify(subject, body, NotifyConfig.from_env())
+    print(f"{subject} (sent via: {', '.join(sent)})")
     print(body)
 
 

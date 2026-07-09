@@ -2,14 +2,18 @@
 
 Pulls current holdings from the Toss Invest Open API and:
 
-- **`portfolio_monitor.digest_main`** — every 2 hours, emails a news digest
+- **`portfolio_monitor.digest_main`** — every 2 hours, sends a news digest
   for each holding (recent headlines, flags anything matching a list of
   market-moving keywords).
-- **`portfolio_monitor.alert_main`** — hourly, emails an alert when a holding:
+- **`portfolio_monitor.alert_main`** — hourly, sends an alert when a holding:
   - moves ±3% or more in a day (`ALERT_PRICE_CHANGE_PCT`)
   - trades at 2x+ its average volume (`ALERT_VOLUME_MULTIPLE`)
   - has a news headline matching an important-event keyword (earnings,
     merger, lawsuit, downgrade, etc. — see `portfolio_monitor/news.py`)
+
+Notifications go out over whichever channels are configured — email, Slack,
+and/or Discord (see `portfolio_monitor/notify.py`). Every configured channel
+gets every message; if one fails the others still go out.
 
 ## Setup
 
@@ -53,5 +57,9 @@ pip install pytest
 pytest
 ```
 
-Covers the alert-rule logic (`tests/test_alerts.py`), which is pure and
-doesn't require live API/network access.
+- `tests/test_alerts.py` — alert-rule logic (pure, no I/O)
+- `tests/test_notify.py` — multi-channel dispatch/fallback behavior
+- `tests/test_toss_client_integration.py` — full auth → account →
+  holdings → candles flow against a fake HTTP session shaped like the real
+  API responses (a smoke test standing in for live API access, which this
+  environment couldn't reach)
