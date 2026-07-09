@@ -48,6 +48,8 @@ class NotifyConfig:
     email_to: str
     slack_webhook_url: str
     discord_webhook_url: str
+    telegram_bot_token: str
+    telegram_chat_id: str
 
     @classmethod
     def from_env(cls) -> "NotifyConfig":
@@ -60,4 +62,6 @@ class NotifyConfig:
             email_to=os.environ.get("NOTIFY_EMAIL_TO", ""),
             slack_webhook_url=os.environ.get("SLACK_WEBHOOK_URL", ""),
             discord_webhook_url=os.environ.get("DISCORD_WEBHOOK_URL", ""),
+            telegram_bot_token=os.environ.get("TELEGRAM_BOT_TOKEN", ""),
+            telegram_chat_id=os.environ.get("TELEGRAM_CHAT_ID", ""),
         )

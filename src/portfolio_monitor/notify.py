@@ -1,4 +1,4 @@
-"""Notification delivery for digests and alerts: email, Slack, Discord."""
+"""Notification delivery for digests and alerts: email, Slack, Discord, Telegram."""
 import smtplib
 from email.mime.text import MIMEText
 
@@ -45,10 +45,25 @@ def send_discord(subject: str, body: str, config: NotifyConfig) -> None:
     resp.raise_for_status()
 
 
+def send_telegram(subject: str, body: str, config: NotifyConfig) -> None:
+    if not (config.telegram_bot_token and config.telegram_chat_id):
+        raise RuntimeError(
+            "Telegram notification is not configured (TELEGRAM_BOT_TOKEN/"
+            "TELEGRAM_CHAT_ID missing)."
+        )
+    resp = requests.post(
+        f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage",
+        json={"chat_id": config.telegram_chat_id, "text": f"{subject}\n\n{body}"},
+        timeout=10,
+    )
+    resp.raise_for_status()
+
+
 _CHANNELS = (
     ("email", send_email, lambda c: bool(c.smtp_host and c.email_from and c.email_to)),
     ("slack", send_slack, lambda c: bool(c.slack_webhook_url)),
     ("discord", send_discord, lambda c: bool(c.discord_webhook_url)),
+    ("telegram", send_telegram, lambda c: bool(c.telegram_bot_token and c.telegram_chat_id)),
 )
 
 

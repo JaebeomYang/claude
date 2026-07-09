@@ -11,9 +11,11 @@
   - 실적, 인수합병, 소송, 신용등급 강등 등 중요 이벤트 키워드가 포함된 뉴스
     헤드라인 발견 (키워드 목록은 `portfolio_monitor/news.py` 참고)
 
-알림은 설정된 채널로 전부 전송됩니다 — 이메일, Slack, Discord 중 설정된
-채널 모두에 매번 발송하며 (`portfolio_monitor/notify.py`), 한 채널이
-실패해도 나머지 채널은 정상적으로 발송됩니다.
+알림은 설정된 채널로 전부 전송됩니다 — 이메일, Slack, Discord, 텔레그램 중
+설정된 채널 모두에 매번 발송하며 (`portfolio_monitor/notify.py`), 한
+채널이 실패해도 나머지 채널은 정상적으로 발송됩니다. 예를 들어 텔레그램만
+쓰고 싶다면 `.env`에 `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID`만 채우고
+나머지 채널 값은 비워두면 됩니다.
 
 ## 설치
 
