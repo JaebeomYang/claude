@@ -18,7 +18,7 @@ class TossConfig:
     @classmethod
     def from_env(cls) -> "TossConfig":
         return cls(
-            base_url=os.environ.get("TOSS_API_BASE_URL", "https://api.tossinvest.com"),
+            base_url=os.environ.get("TOSS_API_BASE_URL", "https://openapi.tossinvest.com"),
             client_id=os.environ.get("TOSS_CLIENT_ID", ""),
             client_secret=os.environ.get("TOSS_CLIENT_SECRET", ""),
             access_token=os.environ.get("TOSS_ACCESS_TOKEN", ""),

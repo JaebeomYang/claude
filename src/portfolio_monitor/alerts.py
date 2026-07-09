@@ -25,15 +25,15 @@ def check_price_move(holding: Holding, config: AlertConfig) -> Alert | None:
 
 
 def check_volume_spike(
-    holding: Holding, avg_volume: float, config: AlertConfig
+    holding: Holding, current_volume: float, avg_volume: float, config: AlertConfig
 ) -> Alert | None:
-    if avg_volume > 0 and holding.volume >= avg_volume * config.volume_multiple:
+    if avg_volume > 0 and current_volume >= avg_volume * config.volume_multiple:
         return Alert(
             ticker=holding.ticker,
             reason="volume_spike",
             detail=(
-                f"{holding.name} volume {holding.volume:,} is "
-                f"{holding.volume / avg_volume:.1f}x its average"
+                f"{holding.name} volume {current_volume:,.0f} is "
+                f"{current_volume / avg_volume:.1f}x its average"
             ),
         )
     return None
@@ -51,12 +51,13 @@ def evaluate_holding(
     holding: Holding,
     news_items: list[NewsItem],
     config: AlertConfig,
+    current_volume: float = 0.0,
     avg_volume: float = 0.0,
 ) -> list[Alert]:
     alerts = []
     if price_alert := check_price_move(holding, config):
         alerts.append(price_alert)
-    if volume_alert := check_volume_spike(holding, avg_volume, config):
+    if volume_alert := check_volume_spike(holding, current_volume, avg_volume, config):
         alerts.append(volume_alert)
     alerts.extend(check_important_news(holding.ticker, news_items))
     return alerts

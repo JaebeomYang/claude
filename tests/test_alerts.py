@@ -13,15 +13,17 @@ from portfolio_monitor.toss_client import Holding
 CONFIG = AlertConfig(price_change_pct=3.0, volume_multiple=2.0)
 
 
-def make_holding(change_pct=0.0, volume=1000):
+def make_holding(change_pct=0.0):
     return Holding(
         ticker="AAPL",
         name="Apple",
+        market_country="US",
+        currency="USD",
         quantity=10,
-        avg_price=100,
-        current_price=100,
+        last_price=100,
+        avg_price=90,
         change_pct=change_pct,
-        volume=volume,
+        profit_loss_rate=11.1,
     )
 
 
@@ -41,17 +43,17 @@ def test_price_move_no_alert_below_threshold():
 
 
 def test_volume_spike_triggers():
-    alert = check_volume_spike(make_holding(volume=3000), avg_volume=1000, config=CONFIG)
+    alert = check_volume_spike(make_holding(), 3000, avg_volume=1000, config=CONFIG)
     assert alert is not None
     assert alert.reason == "volume_spike"
 
 
 def test_volume_spike_no_alert_when_normal():
-    assert check_volume_spike(make_holding(volume=1500), avg_volume=1000, config=CONFIG) is None
+    assert check_volume_spike(make_holding(), 1500, avg_volume=1000, config=CONFIG) is None
 
 
 def test_volume_spike_ignored_when_no_baseline():
-    assert check_volume_spike(make_holding(volume=5000), avg_volume=0, config=CONFIG) is None
+    assert check_volume_spike(make_holding(), 5000, avg_volume=0, config=CONFIG) is None
 
 
 def test_important_news_filters_non_matching():
@@ -65,10 +67,12 @@ def test_important_news_filters_non_matching():
 
 
 def test_evaluate_holding_combines_all_checks():
-    holding = make_holding(change_pct=5.0, volume=4000)
+    holding = make_holding(change_pct=5.0)
     items = [
         NewsItem("AAPL", "Apple CEO to resign", "u1", datetime.now(timezone.utc), True),
     ]
-    alerts = evaluate_holding(holding, items, CONFIG, avg_volume=1000)
+    alerts = evaluate_holding(
+        holding, items, CONFIG, current_volume=4000, avg_volume=1000
+    )
     reasons = {a.reason for a in alerts}
     assert reasons == {"price_move", "volume_spike", "important_news"}

@@ -21,22 +21,20 @@ cp .env.example .env   # fill in credentials, do not commit .env
 Required env vars are documented in `.env.example`. Credentials are only
 ever read from the environment — nothing is hardcoded in the source.
 
-## Known gap: Toss Open API endpoints are unverified
+## Toss Invest Open API integration
 
-`src/portfolio_monitor/toss_client.py` implements a `client_credentials`
-OAuth2 flow against `POST {base_url}/oauth2/token` and reads holdings from
-`GET {base_url}/v1/accounts/holdings`. These paths and the response shape
-are best-effort guesses — outbound network access to
-`developers.tossinvest.com` was blocked in the environment this was
-written in, so the real API docs could not be checked. Before running this
-against a live account:
+`src/portfolio_monitor/toss_client.py` is implemented against the official
+`openapi.tossinvest.com` OpenAPI spec (v1.2.2):
 
-1. Confirm the token endpoint, grant type, and holdings endpoint/response
-   shape against the official docs.
-2. Update `TossClient._ensure_token` / `TossClient.get_holdings` in
-   `toss_client.py` accordingly (the public interface — `get_holdings()`
-   returning a list of `Holding` — is stable, so callers won't need to
-   change).
+- `POST /oauth2/token` — `client_credentials` grant, form-urlencoded. One
+  valid access token per client; reissuing invalidates the previous one.
+- `GET /api/v1/accounts` — resolves the brokerage account's `accountSeq`,
+  used as the `X-Tossinvest-Account` header on every account-scoped call.
+- `GET /api/v1/holdings` — current holdings (quantity, prices, daily/total
+  P&L rates). Does not report volume.
+- `GET /api/v1/candles?interval=1d` — daily OHLCV, used to get today's
+  volume and a trailing average for the volume-spike alert (holdings
+  themselves don't include volume).
 
 ## Running
 
